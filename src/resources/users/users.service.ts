@@ -7,7 +7,7 @@ import {
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdatePasswordDto } from './dto/update-password.dto';
 import { User } from './entities/user.entity';
-import { InMemoryUserDB } from './_store/mockedUserDb';
+import { InMemoryUserDB } from './_store/mockedUserDB';
 
 @Injectable()
 export class UsersService {

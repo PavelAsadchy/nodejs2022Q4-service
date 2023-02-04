@@ -1,26 +1,50 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateTrackDto } from './dto/create-track.dto';
 import { UpdateTrackDto } from './dto/update-track.dto';
+import { Track } from './entities/track.entity';
+import { InMemoryTrackDB } from './_store/mockedTrackDB';
 
 @Injectable()
 export class TracksService {
-  create(createTrackDto: CreateTrackDto) {
-    return 'This action adds a new track';
+  constructor(
+    @Inject('TrackStore')
+    private readonly trackRepository: InMemoryTrackDB,
+  ) {}
+
+  async create(createTrackDto: CreateTrackDto): Promise<Track> {
+    const newTrack = await this.trackRepository.create(createTrackDto);
+
+    return newTrack;
   }
 
-  findAll() {
-    return `This action returns all tracks`;
+  async findAll(): Promise<Track[]> {
+    const tracks = await this.trackRepository.findAll();
+
+    return tracks;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} track`;
+  async findOne(id: string): Promise<Track> {
+    const foundTrack = await this.trackRepository.findById(id);
+    if (!foundTrack) throw new NotFoundException(`Track with ${id} not found`);
+
+    return foundTrack;
   }
 
-  update(id: number, updateTrackDto: UpdateTrackDto) {
-    return `This action updates a #${id} track`;
+  async update(id: string, updateTrackDto: UpdateTrackDto): Promise<Track> {
+    const foundTrack = await this.trackRepository.findById(id);
+    if (!foundTrack) throw new NotFoundException(`Track with ${id} not found`);
+
+    const updatedTrack = await this.trackRepository.update(
+      foundTrack,
+      updateTrackDto,
+    );
+
+    return updatedTrack;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} track`;
+  async remove(id: string): Promise<void> {
+    const removedTrack = await this.trackRepository.delete(id);
+    if (!removedTrack)
+      throw new NotFoundException(`Track with ${id} not found`);
   }
 }

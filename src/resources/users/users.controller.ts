@@ -74,11 +74,11 @@ export class UsersController {
     description: 'The user was not found',
   })
   @ApiForbiddenResponse({ description: 'Forbidden. Old Password is wrong' })
-  updatePassword(
+  async updatePassword(
     @Param('id', new ParseUUIDPipe()) id: string,
     @Body() updatePasswordDto: UpdatePasswordDto,
-  ) {
-    return this.usersService.updatePassword(id, updatePasswordDto);
+  ): Promise<User> {
+    return await this.usersService.updatePassword(id, updatePasswordDto);
   }
 
   @Delete(':id')
@@ -93,7 +93,7 @@ export class UsersController {
     description: 'The user was not found',
   })
   @HttpCode(204)
-  async remove(@Param('id') id: string): Promise<void> {
+  async remove(@Param('id', new ParseUUIDPipe()) id: string): Promise<void> {
     return await this.usersService.remove(id);
   }
 }
