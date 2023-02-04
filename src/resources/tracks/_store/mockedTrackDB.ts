@@ -52,4 +52,10 @@ export class InMemoryTrackDB {
     this.tracks = this.tracks.filter(({ id: _id }) => _id !== id);
     return trackToRemove;
   }
+
+  async findByIds(ids: string[]): Promise<Track[]> {
+    const tracks = this.tracks.filter(({ id }) => ids.includes(id));
+
+    return tracks;
+  }
 }

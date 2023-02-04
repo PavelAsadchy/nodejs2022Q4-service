@@ -47,4 +47,10 @@ export class AlbumsService {
     if (!removedAlbum)
       throw new NotFoundException(`Album with ${id} not found`);
   }
+
+  async findByIds(ids: string[]): Promise<Album[]> {
+    const foundAlbums = await this.albumRepository.findByIds(ids);
+
+    return foundAlbums;
+  }
 }

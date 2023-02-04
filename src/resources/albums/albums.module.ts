@@ -8,7 +8,7 @@ import { InMemoryAlbumDB } from './_store/mockedAlbumDB';
   providers: [
     AlbumsService,
     {
-      provide: 'TrackStore',
+      provide: 'AlbumStore',
       useClass: InMemoryAlbumDB,
     },
   ],

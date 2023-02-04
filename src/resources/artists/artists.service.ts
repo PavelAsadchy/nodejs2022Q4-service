@@ -7,7 +7,7 @@ import { InMemoryArtistDB } from './_store/mockedArtistDB';
 @Injectable()
 export class ArtistsService {
   constructor(
-    @Inject('TrackStore')
+    @Inject('ArtistStore')
     private readonly artistRepository: InMemoryArtistDB,
   ) {}
 
@@ -48,5 +48,11 @@ export class ArtistsService {
     const removedArtist = await this.artistRepository.delete(id);
     if (!removedArtist)
       throw new NotFoundException(`Artist with ${id} not found`);
+  }
+
+  async findByIds(ids: string[]): Promise<Artist[]> {
+    const foundAlbums = await this.artistRepository.findByIds(ids);
+
+    return foundAlbums;
   }
 }

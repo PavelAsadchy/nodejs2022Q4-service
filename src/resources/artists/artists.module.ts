@@ -8,7 +8,7 @@ import { InMemoryArtistDB } from './_store/mockedArtistDB';
   providers: [
     ArtistsService,
     {
-      provide: 'TrackStore',
+      provide: 'ArtistStore',
       useClass: InMemoryArtistDB,
     },
   ],

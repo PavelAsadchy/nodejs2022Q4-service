@@ -47,4 +47,10 @@ export class TracksService {
     if (!removedTrack)
       throw new NotFoundException(`Track with ${id} not found`);
   }
+
+  async findByIds(ids: string[]): Promise<Track[]> {
+    const foundTracks = await this.trackRepository.findByIds(ids);
+
+    return foundTracks;
+  }
 }

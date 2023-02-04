@@ -52,4 +52,10 @@ export class InMemoryArtistDB {
     this.artists = this.artists.filter(({ id: _id }) => _id !== id);
     return artistToRemove;
   }
+
+  async findByIds(ids: string[]): Promise<Artist[]> {
+    const artists = this.artists.filter(({ id }) => ids.includes(id));
+
+    return artists;
+  }
 }
