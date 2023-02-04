@@ -82,13 +82,13 @@ export class ArtistsController {
   @Delete(':id')
   @ApiResponse({
     status: 204,
-    description: 'The track was successfully deleted',
+    description: 'The artist was successfully deleted',
   })
   @ApiBadRequestResponse({
     description: 'Id is invalid (not uuid)',
   })
   @ApiNotFoundResponse({
-    description: 'The track was not found',
+    description: 'The artist was not found',
   })
   @HttpCode(204)
   async remove(@Param('id', new ParseUUIDPipe()) id: string): Promise<void> {

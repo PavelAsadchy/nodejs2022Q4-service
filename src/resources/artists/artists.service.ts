@@ -25,14 +25,16 @@ export class ArtistsService {
 
   async findOne(id: string): Promise<Artist> {
     const foundArtist = await this.artistRepository.findById(id);
-    if (!foundArtist) throw new NotFoundException(`Track with ${id} not found`);
+    if (!foundArtist)
+      throw new NotFoundException(`Artist with ${id} not found`);
 
     return foundArtist;
   }
 
   async update(id: string, updateArtistDto: UpdateArtistDto): Promise<Artist> {
     const foundArtist = await this.artistRepository.findById(id);
-    if (!foundArtist) throw new NotFoundException(`Track with ${id} not found`);
+    if (!foundArtist)
+      throw new NotFoundException(`Artist with ${id} not found`);
 
     const updatedArtist = await this.artistRepository.update(
       foundArtist,
