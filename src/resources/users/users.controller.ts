@@ -3,40 +3,97 @@ import {
   Get,
   Post,
   Body,
-  Patch,
   Param,
   Delete,
+  Put,
+  ParseUUIDPipe,
+  HttpCode,
 } from '@nestjs/common';
+import {
+  ApiBadRequestResponse,
+  ApiCreatedResponse,
+  ApiForbiddenResponse,
+  ApiNotFoundResponse,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { UpdatePasswordDto } from './dto/update-password.dto';
+import { User } from './entities/user.entity';
 
-@Controller('users')
+@ApiTags('User')
+@Controller('user')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Post()
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.usersService.create(createUserDto);
+  @ApiCreatedResponse({
+    description: 'The user was created successfully',
+  })
+  @ApiBadRequestResponse({
+    description: 'Request body does not contain required fields',
+  })
+  async create(@Body() createUserDto: CreateUserDto): Promise<User> {
+    return await this.usersService.create(createUserDto);
   }
 
   @Get()
-  findAll() {
-    return this.usersService.findAll();
+  @ApiResponse({
+    status: 200,
+    description: 'Get all users',
+  })
+  async findAll(): Promise<User[]> {
+    return await this.usersService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.usersService.findOne(+id);
+  @ApiResponse({
+    status: 200,
+    description: 'Get user by id if it exists',
+  })
+  @ApiBadRequestResponse({
+    description: 'Id is invalid (not uuid)',
+  })
+  @ApiNotFoundResponse({
+    description: 'The user was not found',
+  })
+  async findOne(@Param('id', new ParseUUIDPipe()) id: string): Promise<User> {
+    return await this.usersService.findOne(id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(+id, updateUserDto);
+  @Put(':id')
+  @ApiResponse({
+    status: 200,
+    description: 'The user was successfully updated',
+  })
+  @ApiBadRequestResponse({
+    description: 'Id is invalid (not uuid)',
+  })
+  @ApiNotFoundResponse({
+    description: 'The user was not found',
+  })
+  @ApiForbiddenResponse({ description: 'Forbidden. Old Password is wrong' })
+  updatePassword(
+    @Param('id', new ParseUUIDPipe()) id: string,
+    @Body() updatePasswordDto: UpdatePasswordDto,
+  ) {
+    return this.usersService.updatePassword(id, updatePasswordDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.usersService.remove(+id);
+  @ApiResponse({
+    status: 204,
+    description: 'The user was successfully deleted',
+  })
+  @ApiBadRequestResponse({
+    description: 'Id is invalid (not uuid)',
+  })
+  @ApiNotFoundResponse({
+    description: 'The user was not found',
+  })
+  @HttpCode(204)
+  async remove(@Param('id') id: string): Promise<void> {
+    return await this.usersService.remove(id);
   }
 }

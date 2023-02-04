@@ -1,26 +1,60 @@
-import { Injectable } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { UpdatePasswordDto } from './dto/update-password.dto';
+import { User } from './entities/user.entity';
+import { InMemoryUserDB } from './_store/mockedUserDb';
 
 @Injectable()
 export class UsersService {
-  create(createUserDto: CreateUserDto) {
-    return 'This action adds a new user';
+  constructor(
+    @Inject('UserStore')
+    private readonly userRepository: InMemoryUserDB,
+  ) {}
+
+  async create(createUserDto: CreateUserDto): Promise<User> {
+    const newUser = await this.userRepository.create(createUserDto);
+
+    return User.toResponse(newUser);
   }
 
-  findAll() {
-    return `This action returns all users`;
+  async findAll(): Promise<User[]> {
+    const users = await this.userRepository.findAll();
+
+    return users.map(User.toResponse);
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
+  async findOne(id: string): Promise<User> {
+    const foundUser = await this.userRepository.findById(id);
+    if (!foundUser) throw new NotFoundException(`User with ${id} not found`);
+
+    return User.toResponse(foundUser);
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  async updatePassword(
+    id: string,
+    { oldPassword, newPassword }: UpdatePasswordDto,
+  ): Promise<User> {
+    const foundUser = await this.userRepository.findById(id);
+    if (!foundUser) throw new NotFoundException(`User with ${id} not found`);
+
+    if (foundUser.password !== oldPassword)
+      throw new ForbiddenException(`User with ${id} not found`);
+
+    const updatedUser = await this.userRepository.updatePassword(
+      foundUser,
+      newPassword,
+    );
+
+    return updatedUser;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  async remove(id: string): Promise<void> {
+    const removedUser = await this.userRepository.delete(id);
+    if (!removedUser) throw new NotFoundException(`User with ${id} not found`);
   }
 }
