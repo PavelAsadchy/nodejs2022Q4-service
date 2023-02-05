@@ -7,7 +7,8 @@ export class User {
   updatedAt: number;
 
   static toResponse(user: User): User {
-    const { password, ...rest } = user;
+    const rest = { ...user };
+    delete rest.password;
 
     return rest;
   }
