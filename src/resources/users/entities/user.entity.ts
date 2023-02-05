@@ -8,6 +8,7 @@ export class User {
 
   static toResponse(user: User): User {
     const { password, ...rest } = user;
+
     return rest;
   }
 }

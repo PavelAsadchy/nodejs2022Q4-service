@@ -1,4 +1,5 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { TracksService } from '../tracks/tracks.service';
 import { CreateArtistDto } from './dto/create-artist.dto';
 import { UpdateArtistDto } from './dto/update-artist.dto';
 import { Artist } from './entities/artist.entity';
@@ -9,6 +10,7 @@ export class ArtistsService {
   constructor(
     @Inject('ArtistStore')
     private readonly artistRepository: InMemoryArtistDB,
+    private readonly trackService: TracksService,
   ) {}
 
   async create(createArtistDto: CreateArtistDto): Promise<Artist> {
@@ -23,23 +25,21 @@ export class ArtistsService {
     return artists;
   }
 
-  async findOne(id: string): Promise<Artist> {
+  async findOne(id: string, handleNotFoundExeption = true): Promise<Artist> {
     const foundArtist = await this.artistRepository.findById(id);
-    if (!foundArtist)
+    if (!foundArtist && handleNotFoundExeption)
       throw new NotFoundException(`Artist with ${id} not found`);
 
     return foundArtist;
   }
 
   async update(id: string, updateArtistDto: UpdateArtistDto): Promise<Artist> {
-    const foundArtist = await this.artistRepository.findById(id);
-    if (!foundArtist)
-      throw new NotFoundException(`Artist with ${id} not found`);
-
     const updatedArtist = await this.artistRepository.update(
-      foundArtist,
+      id,
       updateArtistDto,
     );
+    if (!updatedArtist)
+      throw new NotFoundException(`Artist with ${id} not found`);
 
     return updatedArtist;
   }
@@ -48,6 +48,8 @@ export class ArtistsService {
     const removedArtist = await this.artistRepository.delete(id);
     if (!removedArtist)
       throw new NotFoundException(`Artist with ${id} not found`);
+
+    await this.trackService.nullFieldIdFromTracks(id, 'artistId');
   }
 
   async findByIds(ids: string[]): Promise<Artist[]> {

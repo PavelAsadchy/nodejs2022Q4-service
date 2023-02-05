@@ -31,7 +31,7 @@ export class FavoritesService {
   }
 
   async addTrackToFavs(id: string): Promise<void> {
-    const track = await this.trackService.findOne(id);
+    const track = await this.trackService.findOne(id, false);
     if (!track) throw new UnprocessableEntityException(id);
 
     const addedId = await this.favoriteRepository.addToCategory(
@@ -53,7 +53,7 @@ export class FavoritesService {
   }
 
   async addAlbumToFavs(id: string): Promise<void> {
-    const album = await this.albumService.findOne(id);
+    const album = await this.albumService.findOne(id, false);
     if (!album) throw new UnprocessableEntityException(id);
 
     const addedId = await this.favoriteRepository.addToCategory(
@@ -75,7 +75,7 @@ export class FavoritesService {
   }
 
   async addArtistToFavs(id: string): Promise<void> {
-    const artist = await this.artistService.findOne(id);
+    const artist = await this.artistService.findOne(id, false);
     if (!artist) throw new UnprocessableEntityException(id);
 
     const addedId = await this.favoriteRepository.addToCategory(

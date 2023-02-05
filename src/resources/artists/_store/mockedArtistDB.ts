@@ -30,12 +30,12 @@ export class InMemoryArtistDB {
     return artist;
   }
 
-  async update(
-    artistToUpdate: Artist,
-    updateArtistDto: UpdateArtistDto,
-  ): Promise<Artist> {
+  async update(id: string, updateArtistDto: UpdateArtistDto): Promise<Artist> {
+    const foundArtist = await this.findById(id);
+    if (!foundArtist) return;
+
     const updatedArtist: Artist = {
-      ...artistToUpdate,
+      ...foundArtist,
       ...updateArtistDto,
     };
 

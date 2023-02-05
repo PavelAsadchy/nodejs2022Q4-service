@@ -30,12 +30,12 @@ export class InMemoryTrackDB {
     return track;
   }
 
-  async update(
-    trackToUpdate: Track,
-    updateTrackDto: UpdateTrackDto,
-  ): Promise<Track> {
+  async update(id: string, updateTrackDto: UpdateTrackDto): Promise<Track> {
+    const foundTrack = await this.findById(id);
+    if (!foundTrack) return;
+
     const updatedTrack: Track = {
-      ...trackToUpdate,
+      ...foundTrack,
       ...updateTrackDto,
     };
 
@@ -50,12 +50,25 @@ export class InMemoryTrackDB {
     if (!trackToRemove) return;
 
     this.tracks = this.tracks.filter(({ id: _id }) => _id !== id);
+
     return trackToRemove;
   }
 
   async findByIds(ids: string[]): Promise<Track[]> {
-    const tracks = this.tracks.filter(({ id }) => ids.includes(id));
+    return this.tracks.filter(({ id }) => ids.includes(id));
+  }
 
-    return tracks;
+  async findAllByKeyId(id: string, key: string): Promise<Track[]> {
+    return this.tracks.filter((track) => track[key] === id);
+  }
+
+  async nullFieldIdFromTracks(id: string, key: string): Promise<void> {
+    const tracksByKeyId = await this.findAllByKeyId(id, key);
+    tracksByKeyId.forEach((track) => {
+      this.update(track.id, {
+        ...track,
+        [key]: null,
+      });
+    });
   }
 }

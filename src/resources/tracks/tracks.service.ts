@@ -23,21 +23,18 @@ export class TracksService {
     return tracks;
   }
 
-  async findOne(id: string): Promise<Track> {
+  async findOne(id: string, handleNotFoundExeption = true): Promise<Track> {
     const foundTrack = await this.trackRepository.findById(id);
-    if (!foundTrack) throw new NotFoundException(`Track with ${id} not found`);
+    if (!foundTrack && handleNotFoundExeption)
+      throw new NotFoundException(`Track with ${id} not found`);
 
     return foundTrack;
   }
 
   async update(id: string, updateTrackDto: UpdateTrackDto): Promise<Track> {
-    const foundTrack = await this.trackRepository.findById(id);
-    if (!foundTrack) throw new NotFoundException(`Track with ${id} not found`);
-
-    const updatedTrack = await this.trackRepository.update(
-      foundTrack,
-      updateTrackDto,
-    );
+    const updatedTrack = await this.trackRepository.update(id, updateTrackDto);
+    if (!updatedTrack)
+      throw new NotFoundException(`Track with ${id} not found`);
 
     return updatedTrack;
   }
@@ -52,5 +49,9 @@ export class TracksService {
     const foundTracks = await this.trackRepository.findByIds(ids);
 
     return foundTracks;
+  }
+
+  async nullFieldIdFromTracks(id: string, key: string): Promise<void> {
+    await this.trackRepository.nullFieldIdFromTracks(id, key);
   }
 }

@@ -43,14 +43,14 @@ export class UsersService {
     if (!foundUser) throw new NotFoundException(`User with ${id} not found`);
 
     if (foundUser.password !== oldPassword)
-      throw new ForbiddenException(`User with ${id} not found`);
+      throw new ForbiddenException('Password is incorrect');
 
     const updatedUser = await this.userRepository.updatePassword(
       foundUser,
       newPassword,
     );
 
-    return updatedUser;
+    return User.toResponse(updatedUser);
   }
 
   async remove(id: string): Promise<void> {
