@@ -1,4 +1,10 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
+import { TypeOrmModule } from '@nestjs/typeorm';
+
+import appConfig from 'src/common/config';
+import { dataSourceConfig } from 'src/common/typeorm.config';
+
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AlbumsModule } from './resources/albums/albums.module';
@@ -24,6 +30,13 @@ import { InMemoryUserDB } from './resources/users/_store/mockedUserDB';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+      load: [appConfig],
+    }),
+    TypeOrmModule.forRootAsync({
+      useFactory: async () => dataSourceConfig,
+    }),
     AlbumsModule,
     UsersModule,
     ArtistsModule,

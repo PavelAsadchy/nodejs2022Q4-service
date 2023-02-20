@@ -1,0 +1,43 @@
+version: '3'
+
+services:
+  app:
+    image: home-library-api-image
+    container_name: home-library-api-service
+    build: .
+    ports:
+      - ${PORT}:${PORT}
+    depends_on:
+      - db
+    environment:
+      - PORT=${PORT}
+    restart: always
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    networks:
+      - home-library-network
+
+  db:
+    image: home-library-db-image
+    container_name: home-library-db
+    build: ./database
+    ports:
+      - ${POSTGRES_PORT}:${POSTGRES_PORT}
+    environment:
+      - POSTGRES_PORT=${POSTGRES_PORT}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+    restart: always
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - home-library-network
+
+networks:
+  home-library-network:
+    driver: bridge
+
+volumes:
+  pgdata:
