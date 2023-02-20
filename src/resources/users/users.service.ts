@@ -19,20 +19,20 @@ export class UsersService {
   async create(createUserDto: CreateUserDto): Promise<User> {
     const newUser = await this.userRepository.create(createUserDto);
 
-    return User.toResponse(newUser);
+    return newUser;
   }
 
   async findAll(): Promise<User[]> {
     const users = await this.userRepository.findAll();
 
-    return users.map(User.toResponse);
+    return users;
   }
 
   async findOne(id: string): Promise<User> {
     const foundUser = await this.userRepository.findById(id);
     if (!foundUser) throw new NotFoundException(`User with ${id} not found`);
 
-    return User.toResponse(foundUser);
+    return foundUser;
   }
 
   async updatePassword(
@@ -50,7 +50,7 @@ export class UsersService {
       newPassword,
     );
 
-    return User.toResponse(updatedUser);
+    return updatedUser;
   }
 
   async remove(id: string): Promise<void> {
